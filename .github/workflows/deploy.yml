@@ -33,6 +33,7 @@ jobs:
             # Tell the action that our Astro project is inside the 'astro' subdirectory
             path: './astro'
             package-manager: npm
+            node-version: 22
 
   deploy:
     needs: build
