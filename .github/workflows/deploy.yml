@@ -1,0 +1,46 @@
+name: Deploy to GitHub Pages
+
+on:
+  # Trigger the workflow every time you push to the main branch
+  push:
+    branches: [ main, master ]
+  
+  # Allows you to run this workflow manually from the Actions tab on GitHub
+  workflow_dispatch:
+  
+  # Automatically rebuild every day at midnight UTC to fetch the latest Albion stats!
+  schedule:
+    - cron: '0 0 * * *'
+
+# Allow this job to clone the repo and create a page deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      # The official Astro action will install npm dependencies, build the static site, 
+      # and upload the 'dist' folder for deployment.
+      - name: Install, build, and upload your site
+        uses: withastro/action@v3
+        with:
+            # Tell the action that our Astro project is inside the 'astro' subdirectory
+            path: './astro'
+            package-manager: npm
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
